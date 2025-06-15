@@ -1,6 +1,10 @@
 import os,csv
 import io
 import stripe
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 from flask import session, request,Response,make_response
 from reportlab.lib import colors
 from reportlab.lib.utils import simpleSplit,ImageReader
@@ -32,16 +36,16 @@ MAX_UPLOADS_GUEST = 1
 # ------------------- App Config -------------------
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '12345678'
+app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'fallback-secret-key')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 basedir = os.path.abspath(os.path.dirname(__file__))
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'users.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-stripe.api_key = 'sk_test_51RVeOuH8ePsBIjVa5ww1ZG7EbaXVgARakBFcwgNHH9hPjqlfB12AmOOLSG6b3bcwWySTMFvO5lq6AtVsKfOoaird005tddGWz8'
+stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
 
 PRICE_IDS = {
-    'premium': 'price_1RWDtXH8ePsBIjVa8ZMH4SWC',  # replace with actual price ID
-    'diamond': 'price_1RWDsfH8ePsBIjVacxX87HVa'
+    'premium': os.getenv('STRIPE_PREMIUM_PRICE_ID'),
+    'diamond': os.getenv('STRIPE_DIAMOND_PRICE_ID')
 }
 # In app.py or settings
 app.config['WTF_CSRF_HEADERS'] = ['X-CSRFToken']
