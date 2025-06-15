@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="{{ url_for('static', filename='assets/img/favicon.png')}}"/>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap JS Bundle (includes Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        aside {
+            width: 250px;
+            background: #1e293b;
+            color: white;
+            padding: 20px;
+        }
+        aside h2 {
+            margin-bottom: 30px;
+            font-size: 24px;
+            color: #38bdf8;
+        }
+        aside ul {
+            list-style: none;
+        }
+        aside ul li {
+            padding: 12px 0;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        aside ul li:hover {
+            background: #334155;
+            padding-left: 10px;
+        }
+        main {
+            flex: 1;
+            background: #f1f5f9;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.controls input,
+.controls button,
+.controls select {
+  margin-top: 8px;
+  margin-bottom: 7px;
+  padding: 6px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  min-width: 150px;
+  flex: 1 1 30%;
+  box-sizing: border-box;
+}
+
+.controls select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: #fff;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23999" height="16" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px 16px;
+  padding-right: 30px;
+  cursor: pointer;
+}
+
+
+ .custom-select {
+      position: relative;
+      width: 200px;
+      font-family: Arial, sans-serif;
+    }
+
+    .custom-select select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      appearance: none;           /* Remove default arrow */
+       -webkit-appearance: none;
+      -moz-appearance: none;
+      background-color: #fff;
+      font-size: 16px;
+      color: #000;
+      cursor: pointer;
+    }  
+
+    /* Add a custom arrow */
+    .custom-select::after {
+      content: "▼";
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      font-size: 12px;
+      color: #555;
+    }
+
+        h1 {
+     font-size: 35px;
+    font-weight: 700;
+    margin-bottom: 19px;
+    color: #0f172a;
+    justify-content: center;
+    display: flex;
+    margin-top: 2px;
+;
+        }
+        .log-section {
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .log-section h2 {
+            margin-bottom: 10px;
+            font-size: 22px;
+            font-weight: 650;
+            color: #1e293b;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+            font-size: 14px;
+        }
+        th {
+            background: #e2e8f0;
+            font-weight: bold;
+        }
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        .hidden { display: none; }
+
+        .btn {
+            background-color: #38bdf8;
+            border: none;
+            margin-top: -1px;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: auto;
+            text-decoration: none;
+        }
+        .btn:hover {
+            background-color: #0ea5e9;
+        }
+
+        /* MENU TOGGLE BUTTON (Hamburger icon) */
+.menu-toggle {
+    display: none;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 9999;
+    background-color: #1e293b;
+    color: white;
+    border: none;
+    font-size: 24px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+@media screen and (max-width: 1045px) {
+    aside {
+        position: fixed;
+        top: 0;
+        left: -250px; /* Hidden by default */
+        height: 100%;
+        width: 250px;
+        z-index: 999;
+        transition: left 0.3s ease;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+    }
+
+    aside.show {
+        left: 0;
+    }
+
+    main {
+        flex: 1;
+        padding: 15px;
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .menu-toggle {
+        display: block;
+    }
+
+    body {
+        flex-direction: column;
+    }
+
+    table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    th, td {
+        font-size: 13px;
+        padding: 6px;
+    }
+
+    .controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .controls input,
+    .controls button,
+    .controls select {
+        width: 100%;
+    }
+
+    h1 {
+        font-size: 26px;
+        text-align: center;
+    }
+}
+
+/* Small screen layout */
+@media screen and (max-width: 768px) {
+    aside {
+        position: fixed;
+        top: 0;
+        left: -250px; /* Hidden by default */
+        height: 100%;
+        width: 250px;
+        z-index: 999;
+        transition: left 0.3s ease;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+    }
+
+    aside.show {
+        left: 0;
+    }
+
+    main {
+        flex: 1;
+        padding: 20px;
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .menu-toggle {
+        display: block;
+    }
+
+    body {
+        flex-direction: column;
+    }
+    table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    th, td {
+        font-size: 13px;
+        padding: 3px;
+    }
+}
+
+
+        canvas {
+            margin-top: 20px;
+            max-width: 100%;
+        }
+        aside {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.menu {
+    flex-grow: 1;
+}
+
+
+.bottom-btn {
+    padding-top: 20px;
+}
+
+.back-btn {
+    display: inline-block;
+    background-color: #38bdf8;
+    color: white;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    text-align: center;
+    width: 100%;
+    transition: background 0.3s;
+    border: none;
+}
+
+.back-btn:hover {
+    background-color: #0ea5e9;
+}
+
+</style>
+
+
+</head>
+
+<body>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    
+<aside>
+    <h2>Admin Panel</h2>
+      <div class="menu">
+        <ul>
+            <li onclick="toggleSection('manage-users')">Manage Users</li>
+            <li onclick="toggleSection('view-users')">View All Users</li>
+            <li onclick="toggleSection('signup')">Signup Logs</li>
+            <li onclick="toggleSection('login')">Login Logs</li>
+            <li onclick="toggleSection('payment-history')">Payment History</li>
+            <li onclick="toggleSection('session')">Session Logs</li>
+            <li onclick="toggleSection('charts')">Charts</li>
+        </ul>
+    </div>
+    <div class="bottom-btn">
+        <a href="{{ url_for('home') }}" class="btn back-btn">← Back to Home</a>
+    </div>
+</aside>
+
+<main>
+    
+    <h1>Admin Dashboard</h1>
+
+    <!-- Manage users -->
+    <div id="add-users" class="log-section ">
+         <h2>Add Users</h2>
+    
+       <!-- Add User Form -->
+     <form action="{{ url_for('add_user') }}" method="POST" style="margin-bottom: -5px;">
+      <div class="controls">
+     <input type="text" name="username" placeholder="Username" required
+      pattern="^[A-Za-z][A-Za-z0-9._]{2,19}$"
+       title="Username must start with a letter and be 3–20 characters long." />
+       <input type="email" name="email" placeholder="Email" required
+        pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z.-]+\.[cC][oO][mM]$"
+         title="Email must contain @ and end with .com (letters only in domain)" />
+      <input type="password" name="password" placeholder="Password" required minlength="6" />
+      <select name="role" id="role" class="form-select"  required>
+      <option disabled selected value="">Select Role</option>
+      <option value="user">User</option>
+      <option value="admin">Admin</option>
+     </select>
+      </div>
+
+    
+     <button class="btn" type="submit">Add User</button>
+  
+</form>
+</div>
+    
+<!-- User Management -->
+<div id="manage-users" class="log-section">
+
+  <!-- Flex container for title + search -->
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+    <h2 style="margin: 0;">User Management</h2>
+    
+    <!-- Search Field -->
+    <form method="GET" action="{{ url_for('manage_users') }}" >
+      <input type="text" name="search" placeholder="Search by username or email" value="{{ request.args.get('search', '') }}">
+      <button type="submit" class="btn">Search</button>
+        <a href="{{ url_for('admin_dashboard') }}" class="btn">Clear</a>
+    </form>
+  </div>
+
+  <!-- User Table -->
+  <div>   
+    <table>
+      <tr><th>ID</th><th>Username</th><th>Email</th><th>Password</th><th>Role</th><th>Actions</th></tr>
+      {% for user in users %}
+      <tr>
+        <td>{{ user.id }}</td>
+        <td>
+          <form action="{{ url_for('edit_user', user_id=user.id) }}" method="POST" style="display: inline-flex; gap: 5px;">
+            <input type="text" name="username" value="{{ user.username }}" required />
+        </td>
+        <td>
+          <input type="email" name="email" value="{{ user.email }}" required />
+        </td>
+        <td>
+          <input type="password" name="password" placeholder="Leave blank to keep unchanged" />
+        </td>
+        <td>
+          <select name="role">
+            <option value="user" {% if user.role == 'user' %}selected{% endif %}>User</option>
+            <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+          </select>
+        </td>
+        <td>
+          <button class="btn" type="submit">Update</button>
+          </form>
+
+          <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST" style="display:inline;">
+            <button class="btn" type="submit" style="background-color: red;">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+
+ <!-- View Users Section -->
+<div id="view-users" class="log-section hidden" style="
+    padding-top: 28px;
+    padding-right: 12px;
+    padding-bottom: 31px;
+    padding-left: 11px;
+">
+    <h2>All Registered Users</h2>
+    <!-- Filter Form -->
+<form method="get" action="{{ url_for('admin_dashboard') }}" 
+      class="controls" 
+      style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; width: 100%;">
+
+  <input type="hidden" name="section" value="view-users">
+
+  <!-- Search Field (takes full width on small screens, and grows on large) -->
+  <input type="text" name="user_search" placeholder="Search by username"
+         value="{{ request.args.get('user_search', '') }}"
+         style="flex: -1 1 250px; padding: 8px 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; min-width: 200px;">
+
+  <!-- Button Group aligned to right -->
+  <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+
+    <button type="submit"
+            class="btn"
+            style="padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 6px; font-size: 14px;">
+      Filter
+    </button>
+
+    <a href="{{ url_for('admin_dashboard', section='view-users') }}"
+       class="btn"
+       style="padding: 8px 28px; background-color: #6c757d; color: white; border-radius: 6px; text-decoration: none; display: inline-block; font-size: 14px;">
+      Clear
+    </a>
+
+    <a href="{{ url_for('export_users_csv', user_search=request.args.get('user_search', '')) }}"
+       class="btn"
+       style="padding: 8px 8px; background-color: #28a745; color: white; border-radius: 6px; text-decoration: none; display: inline-block; font-size: 14px;">
+      Export CSV
+    </a>
+
+  </div>
+</form>
+
+
+<p>Total Users: {{ users|length }}</p>
+
+    <table id="viewUsersTable">
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <!-- <th>Password (hashed)</th> -->
+                    <th>Upload Attempts</th>
+                    <th>Subscribed</th>
+                    <th>Is Admin</th>
+                    <th>Role</th>
+                    <th>Upload Limit</th>
+                    <th>Subscription Date</th>
+                    <th>Subscription Plan</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <!-- <td>{{ user.password[:10] }}...</td>  Optional: show part of hash -->
+                    <td>{{ user.upload_attempts }}</td>
+                    <td>{{ 'Yes' if user.subscribed else 'No' }}</td>
+                    <td>{{ 'Yes' if user.is_admin else 'No' }}</td>
+                    <td>{{ user.role }}</td>
+                    <td>{{ user.upload_limit }}</td>
+                    <td>{{ user.subscription_date.strftime('%Y-%m-%d') if user.subscription_date else 'N/A' }}</td>
+                    <td>{{ user.subscription_plan }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+</div>
+
+
+    <!-- Signup history Section -->
+    <div id="signup" class="log-section">
+        <h2>Signup History</h2>
+       <form method="get" action="{{ url_for('admin_dashboard') }}" class="controls"
+      style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+
+  <input type="hidden" name="section" value="signup">
+
+  <!-- Top row: filters -->
+  <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    <input type="text" name="signup_username" placeholder="Filter by username"
+           value="{{ request.args.get('signup_username', '') }}"
+           style="flex: -1 1 200px; padding: 8px 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; min-width: 160px;">
+
+    <input type="date" name="signup_start" value="{{ request.args.get('signup_start', '') }}"
+           style="flex: -1 1 150px; padding: 8px 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; min-width: 130px;">
+
+    <input type="date" name="signup_end" value="{{ request.args.get('signup_end', '') }}"
+           style="flex: -1 1 150px; padding: 8px 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; min-width: 130px;">
+  </div>
+
+  <!-- Second row: buttons -->
+  <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    <button type="submit"
+            class="btn"
+            style="flex: -1 1 150px; min-width: 120px; padding: 8px 12px; background-color: #007bff; color: white; border: none; border-radius: 6px; font-size: 14px;">
+      Filter
+    </button>
+
+    <a href="{{ url_for('admin_dashboard', section='signup') }}"
+       class="btn"
+       style="flex: -1 1 150px; min-width: 120px; padding: 8px 12px; background-color: #6c757d; color: white; text-align: center; text-decoration: none; border-radius: 6px; font-size: 14px;">
+      Clear
+    </a>
+
+    <a class="btn"
+       href="{{ url_for('export_signup_csv',
+                        signup_username=request.args.get('signup_username', ''),
+                        signup_start=request.args.get('signup_start', ''),
+                        signup_end=request.args.get('signup_end', '')) }}"
+       style="flex: -1 1 150px; min-width: 120px; padding: 8px 12px; background-color: #28a745; color: white; text-align: center; text-decoration: none; border-radius: 6px; font-size: 14px;">
+      Export CSV
+    </a>
+  </div>
+
+</form>
+
+
+       <p>Total Records: {{ signup_logs|length }}</p>
+
+        <table id="signupTable">
+            <tr><th>ID</th><th>Username</th><th>Timestamp</th></tr>
+            {% for log in signup_logs %}
+            <tr>
+                <td>{{ log.id }}</td>
+                <td>{{ log.username }}</td>
+                <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <!-- Login history Section -->
+    <div id="login" class="log-section hidden">
+        <h2>Login History</h2>
+         <!-- Filter form -->
+    <form method="get" action="{{ url_for('admin_dashboard') }}" class="controls"
+      style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+
+  <input type="hidden" name="section" value="login">
+
+  <!-- First row: Input filters -->
+  <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    <input type="text" name="login_username" placeholder="Filter by username"
+           value="{{ request.args.get('login_username', '') }}"
+           style="flex: -1 1 200px; padding: 8px 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; min-width: 160px;">
+
+    <input type="date" name="login_start" value="{{ request.args.get('login_start', '') }}"
+           style="flex: -1 1 150px; padding: 8px 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; min-width: 130px;">
+
+    <input type="date" name="login_end" value="{{ request.args.get('login_end', '') }}"
+           style="flex: -1 1 150px; padding: 8px 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; min-width: 130px;">
+  </div>
+
+  <!-- Second row: Buttons -->
+  <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    <button type="submit"
+            class="btn"
+            style="flex: -1 1 150px; min-width: 120px; padding: 8px 12px; background-color: #007bff; color: white; border: none; border-radius: 6px; font-size: 14px;">
+      Filter
+    </button>
+
+    <a href="{{ url_for('admin_dashboard', section='login') }}"
+       class="btn"
+       style="flex: -1 1 150px; min-width: 120px; padding: 8px 12px; background-color: #6c757d; color: white; text-align: center; text-decoration: none; border-radius: 6px; font-size: 14px;">
+      Clear
+    </a>
+
+    <a href="{{ url_for('export_login_csv',
+                        login_username=request.args.get('login_username', ''),
+                        login_start=request.args.get('login_start', ''),
+                        login_end=request.args.get('login_end', '')) }}"
+       class="btn"
+       style="flex: -1 1 150px; min-width: 120px; padding: 8px 12px; background-color: #28a745; color: white; text-align: center; text-decoration: none; border-radius: 6px; font-size: 14px;">
+      Export CSV
+    </a>
+  </div>
+
+</form>
+
+    <p>Total Records: {{ login_logs|length }}</p>
+
+        <table id="loginTable">
+            <tr><th>ID</th><th>User ID</th><th>Username</th><th>Success</th><th>Timestamp</th></tr>
+            {% for log in login_logs %}
+            <tr>
+                <td>{{ log.id }}</td>
+                <td>{{ log.user_id }}</td>
+                <td>{{ log.username }}</td>
+                <td>{{ 'Yes' if log.success else 'No' }}</td>
+                <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <!-- Payment History Section -->
+<div id="payment-history" class="log-section hidden">
+  <h2>Payment History</h2>
+
+<form method="get" action="{{ url_for('admin_dashboard') }}"
+      style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+
+  <input type="hidden" name="section" value="payment-history">
+
+  <!-- Top Row: Search + Date Filters -->
+  <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    <input type="text" placeholder="Search..." name="search"
+           onkeyup="filterTable(this, 'paymentTable')"
+           style="flex: 1 1 250px; padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; min-width: 160px;">
+
+    <input type="date" name="start_date" value="{{ start_date or '' }}"
+           style="flex: 1 1 150px; padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; min-width: 130px;">
+    
+    <input type="date" name="end_date" value="{{ end_date or '' }}"
+           style="flex: 1 1 150px; padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; min-width: 130px;">
+  </div>
+
+  <!-- Bottom Row: Buttons -->
+  <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    <!-- Long Filter Button -->
+    <button type="submit"
+            class="btn"
+            style="flex: 2 1 515px; padding: 8px 12px; background-color: #007bff; color: white; border: none; border-radius: 6px; font-size: 14px;">
+      Filter
+    </button>
+
+    <!-- Equal-sized Clear Button -->
+    <a href="{{ url_for('admin_dashboard', section='payment-history') }}"
+       class="btn"
+       style="flex: 1 1 10px; padding: 8px 12px; background-color: #6c757d; color: white; text-align: center; text-decoration: none; border-radius: 6px; font-size: 14px;">
+      Clear
+    </a>
+
+    <!-- Equal-sized Export CSV Button -->
+    <button type="button"
+            class="btn"
+            onclick="exportTableToCSV('paymentTable', 'payment_history.csv')"
+            style="flex: 1 1 10px; padding: 8px 12px; background-color: #28a745; color: white; border: none; border-radius: 6px; font-size: 14px;">
+      Export CSV
+    </button>
+  </div>
+</form>
+
+
+<!-- Revenue Summary -->
+<div style="margin-bottom: 10px; margin-top: 15px; font-weight: 600;">
+    <p>Total Payments: {{ payments|length }}</p>
+    <p>Total Revenue: ${{ '%.2f' % total_revenue }}</p>
+    <p>Premium Revenue: ${{ '%.2f' % revenue_by_plan['Premium'] }}</p>
+    <p>Diamond Revenue: ${{ '%.2f' % revenue_by_plan['Diamond'] }}</p>
+</div>
+  <hr>
+  <h3>Subscription Tier Breakdown</h3>
+  <ul>
+    <li><strong>Free Users:</strong> {{ plan_counts['Free'] }}</li>
+    <li><strong>Premium Users:</strong> {{ plan_counts['Premium'] }}</li>
+    <li><strong>Diamond Users:</strong> {{ plan_counts['Diamond'] }}</li>
+  </ul> 
+ <button class="btn" onclick="window.location.href='{{ url_for('export_summary_csv') }}'">Export Revenue Summary</button>
+
+  <table id="paymentTable">
+    <tr>
+      <th>ID</th>
+      <th>Username</th>
+      <th>Plan</th>
+      <th>Amount</th>
+      <th>Payment Time</th>
+    </tr>
+    {% for payment in payments %}
+    <tr>
+      <td>{{ payment.id }}</td>
+      <td>{{ payment.username }}</td>
+      <td>{{ payment.plan }}</td>
+      <td>${{ '%.2f' % payment.amount }}</td>
+      <td>{{ payment.payment_time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+    <!-- Session history Section -->
+    <div id="session" class="log-section hidden">
+        <h2>Session History</h2>
+        <!-- Filter Form -->
+  <form method="get" action="{{ url_for('admin_dashboard') }}"
+      style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+
+  <input type="hidden" name="section" value="session">
+
+  <!-- Top Row: Username + Date Filters -->
+  <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    <input type="text" name="session_username" value="{{ request.args.get('session_username', '') }}"
+           placeholder="Filter by username"
+           style="flex: 1 1 250px; padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; min-width: 160px;">
+
+    <input type="date" name="session_start" value="{{ request.args.get('session_start', '') }}"
+           style="flex: 1 1 150px; padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; min-width: 130px;">
+
+    <input type="date" name="session_end" value="{{ request.args.get('session_end', '') }}"
+           style="flex: 1 1 150px; padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; min-width: 130px;">
+  </div>
+
+  <!-- Bottom Row: Buttons -->
+  <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    <button type="submit" class="btn"
+            style="flex: 3 1 600px; padding: 8px 12px; background-color: #007bff; color: white; border: none; border-radius: 6px; font-size: 14px;">
+      Filter
+    </button>
+
+    <a href="{{ url_for('admin_dashboard', section='session') }}" class="btn"
+       style="flex: 1 1 70px; padding: 8px 12px; background-color: #6c757d; color: white; text-align: center; text-decoration: none; border-radius: 6px; font-size: 14px;">
+      Clear
+    </a>
+
+    <a href="{{ url_for('export_session_csv',
+                        session_username=request.args.get('session_username', ''),
+                        session_start=request.args.get('session_start', ''),
+                        session_end=request.args.get('session_end', '')) }}"
+       class="btn"
+       style="flex: 1 1 70px; padding: 8px 12px; background-color: #28a745; color: white; text-align: center; text-decoration: none; border-radius: 6px; font-size: 14px;">
+      Export CSV
+    </a>
+  </div>
+</form>
+
+  <p style="margin-top: 10px;">Total Records: {{ session_logs|length }}</p>
+
+        <table id="sessionTable">
+            <tr><th>ID</th><th>User ID</th><th>Username</th><th>Action</th><th>Timestamp</th></tr>
+            {% for log in session_logs %}
+            <tr>
+                <td>{{ log.id }}</td>
+                <td>{{ log.user_id }}</td>
+                <td>{{ log.username }}</td>
+                <td>{{ log.action }}</td>
+                <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+  
+    
+
+    <!-- Charts -->
+    <div id="charts" class="log-section hidden">
+        <h2>Login Frequency (Demo Chart)</h2>
+        <canvas id="loginChart" width="400" height="200"></canvas>
+
+    </div>
+</main>
+
+
+
+
+<script>
+   
+function toggleSection(id) {
+  const sections = document.querySelectorAll('.log-section');
+
+  if (id === 'manage-users') {
+    // Show both manage and add user sections
+    sections.forEach(section => {
+      if (section.id === 'manage-users' || section.id === 'add-users') {
+        section.classList.remove('hidden');
+      } else {
+        section.classList.add('hidden');
+      }
+    });
+  } else if (id === 'view-users') {
+    // Show only the view users section
+    sections.forEach(section => {
+      if (section.id === 'view-users') {
+        section.classList.remove('hidden');
+      } else {
+        section.classList.add('hidden');
+      }
+    });
+  } else {
+    // Show selected and hide everything else
+    sections.forEach(section => {
+      if (section.id === id) {
+        section.classList.remove('hidden');
+      } else {
+        section.classList.add('hidden');
+      }
+    });
+  }
+}
+
+
+
+
+
+    // Filter table based on input value
+    
+function filterTable(input, tableId) {
+    let filter = input.value.toLowerCase();
+    let table = document.getElementById(tableId);
+    let rows = table.getElementsByTagName("tr");
+
+    for (let i = 1; i < rows.length; i++) {
+        let username = rows[i].getElementsByTagName("td")[1]; // 2nd column: username
+        let email = rows[i].getElementsByTagName("td")[2];    // 3rd column: email
+
+        if (username && email) {
+            let usernameText = username.textContent.toLowerCase();
+            let emailText = email.textContent.toLowerCase();
+
+            if (usernameText.includes(filter) || emailText.includes(filter)) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    }
+}
+
+
+
+    // Export table data to CSV file
+    function exportTableToCSV(tableId, filename) {
+        const table = document.getElementById(tableId);
+        let csv = [];
+        for (let row of table.rows) {
+            let rowData = [...row.cells].map(cell => `"${cell.innerText}"`);
+            csv.push(rowData.join(","));
+        }
+        const blob = new Blob([csv.join("\n")], { type: 'text/csv' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+    }
+
+   
+
+    // Bootstrap toasts + Default section display
+    document.addEventListener('DOMContentLoaded', function () {
+  // Show Manage Users by default on page load
+  toggleSection('manage-users');
+
+  // Show bootstrap toasts if any
+  var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+  toastElList.forEach(function (toastEl) {
+    var toast = new bootstrap.Toast(toastEl);
+    toast.show();
+  });
+});
+
+</script>
+
+<!-- Toast container -->
+<div aria-live="polite" aria-atomic="true" 
+     style="position: fixed; top: 1rem; right: 1rem; z-index: 1050;">
+  <div id="toast-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="toast align-items-center text-bg-{{ category }} border-0 mb-2" 
+             role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="50000">
+          <div class="d-flex">
+            <div class="toast-body">
+              {{ message }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" 
+                    data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        </div>
+      {% endfor %}
+    {% endwith %}
+  </div>
+</div>
+
+<script> 
+  // Create the toggle button dynamically
+  const toggleBtn = document.createElement("button");
+  toggleBtn.className = "menu-toggle";
+  toggleBtn.innerHTML = "☰";
+  document.body.appendChild(toggleBtn);
+
+  const sidebar = document.querySelector("aside");
+
+  // Toggle sidebar visibility on button click
+  toggleBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("show");
+  });
+
+  // Close sidebar when clicking outside (for mobile)
+  document.addEventListener("click", (e) => {
+    if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+      sidebar.classList.remove("show");
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+  const params = new URLSearchParams(window.location.search);
+  const section = params.get("section") || "manage-users";
+  toggleSection(section);
+});
+
+document.querySelector('form').addEventListener('submit', function(e) {
+    const email = document.querySelector('input[name="email"]').value;
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.com$/;
+
+    if (!regex.test(email)) {
+      e.preventDefault();
+      alert("Please enter a valid email address ending with .com");
+    }
+  });
+  
+   // Load login frequency chart using Chart.js
+    document.addEventListener('DOMContentLoaded', async function () {
+        const ctx = document.getElementById('loginChart');
+        if (!ctx) return;
+
+        try {
+            const response = await fetch('/api/login_chart_data');
+            const data = await response.json();
+
+            if (data.error) {
+                console.error('Error fetching data:', data.error);
+                return;
+            }
+
+            const labels = Object.keys(data);
+            const values = Object.values(data);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Login Frequency',
+                        data: values,
+                        backgroundColor: '#38bd8f',
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 }
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Failed to fetch login chart data:', error);
+        }
+    });
+</script>
+
+
+
+</body>
+</html>

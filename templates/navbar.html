@@ -1,0 +1,69 @@
+
+<header id="header" class="fixed-top" style="    padding-top: 10px;
+    padding-bottom: 10px;">
+  <div class="container d-flex align-items-center">
+    <h1 class="logo mr-auto">
+    <!-- Uncomment below if you prefer to use an image logo -->
+    <a href="{{ url_for('home') }}" class="logo mr-auto"><img src="static\assets\img\logo.png" alt="" class="img-fluid"></a>
+   <a href="{{ url_for('home') }}" class="title" >Cotton Disease Detection</a>
+    </h1>
+  
+    <nav class="nav-menu d-none d-lg-block">
+  <ul>
+    <li class="active"><a href="{{ url_for('home') }}" target="_self">Home</a></li>
+    <!-- <li><a href="{{ url_for('try_page') }}" target="_blank">Run Application</a></li> -->
+    <li class="drop-down"><a href="{{ url_for('diseases_info') }}">Diseases Info</a> 
+      <ul>
+        <li><a href="{{ url_for('aphids') }}">Aphids</a></li>
+        <li><a href="{{ url_for('army_worm') }}">Army Worm</a></li>
+        <li><a href="{{ url_for('bacterial_blight') }}">Bacterial Blight</a></li>
+        <li><a href="{{ url_for('powdery_mildew') }}">Powdery Mildew</a></li>
+        <li><a href="{{ url_for('target_spot') }}">Target Spot</a></li> 
+      </ul>
+    </li>
+    
+    {% if not current_user.is_admin %}
+      <li><a href="{{ url_for('subscription') }}">Pricing</a></li>
+    {% endif %}
+    
+     {% if current_user.is_authenticated %}
+      <li><a href="{{ url_for('my_reports') }}" target="_blank">Reports</a></li>
+    {% endif %}
+
+
+    {% if current_user.is_authenticated and current_user.is_admin %}
+      <li><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+      <li><a href="{{ url_for('logout') }}">Logout</a></li>  <!-- Add logout for admin here -->
+
+    {% endif %}
+    
+  
+    {% if current_user.is_authenticated and not current_user.is_admin %}
+      <li class="drop-down">
+        <a href="{{ url_for('profile') }}">Profile</a>
+        <ul>
+          <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+      </li>
+    {% elif not current_user.is_authenticated %}
+      <li class="drop-down">
+        <a href="#">Login</a>
+        <ul>
+          <li><a href="{{ url_for('login') }}">Signin</a></li>
+          <li><a href="{{ url_for('register') }}">Signup</a></li>
+        </ul>
+      </li>
+    {% endif %}
+  </ul>
+</nav>
+
+    
+    <!-- .nav-menu -->
+
+    <a href="{{ url_for('try_page') }}" target="_blank" class="get-started-btn scrollto">
+      Get Started
+    </a>
+  </div>
+  
+</header>
+

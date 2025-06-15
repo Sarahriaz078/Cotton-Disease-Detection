@@ -1,0 +1,352 @@
+
+<head>
+    <title>My Reports - Cotton Disease Detection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap JS Bundle (includes Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+ <style>
+       body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f7fafc;
+  color: #1a202c;
+}
+
+.container {
+  padding: 10px;
+}
+
+h2 {
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.report-card {
+  background-color: white;
+  padding: 35px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+th, td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+
+.download-btn {
+    display: inline-block;
+    background-color: rgb(55, 81, 126); /* Button background */
+    color: white;                       /* Text color */
+    padding: 10px 16px;                 /* Padding around text */
+    border-radius: 6px;                 /* Rounded corners */
+    text-decoration: none;              /* Remove underline */
+    font-weight: bold;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.download-btn:hover {
+    background-color: rgb(40, 60, 100); /* Darker on hover */
+    color: #fff;
+}
+
+.download-btn i {
+    margin-right: 6px; /* Space between icon and text */
+}
+
+.upload-btn {
+  display: inline-block;
+  background-color: #1eaf40 ; /* #1e40af */
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+  margin-left: 15px;
+
+}
+
+.upload-btn:hover {
+  background-color: rgb(30, 58, 138); /* #1e3a8a */
+  color: white;
+}
+.upload-btn i {
+  margin-right: 6px;
+}
+/* Medium-small screens (tablets, large phones landscape) */
+@media (max-width: 914px) {
+  table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .pagination {
+    justify-content: center !important;
+  }
+
+  .upload-btn {
+    width: 85%;
+    text-align: center;
+  }
+
+  table th, table td {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
+
+/* Smaller screens (phones, portrait tablets) */
+@media (max-width: 768px) {
+  form.d-flex.gap-2 {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  form.d-flex.gap-2 input,
+  form.d-flex.gap-2 button,
+  form.d-flex.gap-2 a {
+    width: 100% !important;
+  }
+
+  .d-flex.justify-content-between.align-items-center.flex-wrap,
+  .d-flex.justify-content-between.align-items-center.mt-4.flex-wrap {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 10px;
+  }
+
+  .upload-btn {
+    width: 85%;
+    text-align: center;
+  }
+
+  table th, table td {
+    font-size: 13px;
+    padding: 8px;
+  }
+}
+@media (max-width: 768px) {
+  /* Make table scrollable */
+  table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  /* Stack filter form fields vertically */
+  form.d-flex.gap-2 {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  form.d-flex.gap-2 input,
+  form.d-flex.gap-2 button,
+  form.d-flex.gap-2 a {
+    width: 100% !important;
+  }
+
+  /* Align title + filter form properly */
+  .d-flex.justify-content-between.align-items-center.flex-wrap {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+
+  /* Pagination center on small devices */
+  .pagination {
+    justify-content: center !important;
+  }
+
+  /* Align upload message + button vertically */
+  .d-flex.justify-content-between.align-items-center.mt-4.flex-wrap {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .upload-btn {
+    width: 85%;
+    text-align: center;
+  }
+
+  /* Adjust table heading font size */
+  table th,
+  table td {
+    font-size: 13px;
+    padding: 8px;
+  }
+}
+
+</style>
+</head>
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="report-card">
+<div class="d-flex justify-content-between align-items-center mb-0 flex-wrap">
+  <!-- Left: Title -->
+  <h3 class="mb-3">My Reports</h3>
+
+  <!-- Right: Filter Form -->
+  {% if current_user.is_admin %}
+  <form method="get" class="d-flex gap-2">
+    <input type="text" name="username" value="{{ username_filter }}" placeholder="Filter by username" class="form-control" style="width: 250px;">
+    <input type="date" name="start_date" value="{{ start_date or '' }}" class="form-control">
+    <input type="date" name="end_date" value="{{ end_date or '' }}" class="form-control">
+    <button type="submit" class="btn btn-primary">Filter</button>
+    <a href="{{ url_for('my_reports') }}" class="btn btn-secondary">Clear</a>
+  </form>
+ 
+</div>
+
+{% endif %}
+ {% if current_user.is_admin %}
+  <p><strong>Total Reports:</strong> {{ total_reports }}</p>
+{% endif %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>User</th>
+          <th>Image</th>
+          <th>Prediction</th>
+          <th>Confidence</th>
+          <th>Date</th>
+          <th>Download</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for report in reports %}
+        <tr>
+          <td>{{ loop.index + (pagination.page - 1) * pagination.per_page }}</td>
+          <td>{{ report.user.username }}</td>  
+          <td>{{ report.filename }}</td>
+          <td>{{ report.prediction }}</td>
+          <td>{{ report.confidence }}%</td>
+          <td>{{ report.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+          <td>
+            <a href="{{ url_for('download_report', report_id=report.id) }}" class="download-btn">
+              <i class="fa fa-download"></i> Download Report
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    
+    <!-- Pagination -->
+   {% if pagination.pages > 1 %}
+  {% set args = request.args.to_dict() %}
+  <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+
+      {% if pagination.has_prev %}
+        <li class="page-item">
+          <a class="page-link" href="{{ url_for('my_reports', page=pagination.prev_num, **args) }}">Previous</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Previous</span></li>
+      {% endif %}
+
+      <li class="page-item disabled">
+        <span class="page-link">Page {{ pagination.page }} / {{ pagination.pages }}</span>
+      </li>
+
+      {% if pagination.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="{{ url_for('my_reports', page=pagination.next_num, **args) }}">Next</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Next</span></li>
+      {% endif %}
+
+    </ul>
+  </nav>
+{% endif %}
+
+<div class="d-flex justify-content-between align-items-center mt-4 flex-wrap">
+  <p class="mb-0">
+    If you want to detect more, please upload one now to detect diseases in your cotton plants!
+  </p>
+  <a href="{{ url_for('try_page') }}" class="upload-btn">
+    <i class="fa fa-upload"></i> Upload Image
+  </a>
+</div>
+
+
+    {% if disease_counts %}
+  <hr>
+  <h4>Disease Frequency Analysis</h4>
+  <ul>
+    {% for disease, count in disease_counts.items() %}
+      <li><strong>{{ disease }}:</strong> {{ count }} case{{ 's' if count > 1 else '' }}</li>
+    {% endfor %}
+  </ul>
+  <a class="btn btn-sm btn-success" 
+   href="{{ url_for('export_disease_frequency_csv', username=username_filter, start_date=start_date, end_date=end_date) }}">
+  Export Frequency CSV
+</a>
+
+{% endif %}
+  </div>
+  
+
+</div>
+
+
+
+
+          <!-- Toast container -->
+<div aria-live="polite" aria-atomic="true" 
+     style="position: fixed; top: 1rem; right: 1rem; z-index: 1050;">
+  <div id="toast-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="toast align-items-center text-bg-{{ category }} border-0 mb-2" 
+             role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="50000">
+          <div class="d-flex">
+            <div class="toast-body">
+              {{ message }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" 
+                    data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        </div>
+      {% endfor %}
+    {% endwith %}
+  </div>
+</div>
+
+<!-- Bootstrap toast script -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+    toastElList.forEach(function(toastEl) {
+      var toast = new bootstrap.Toast(toastEl)
+      toast.show()
+    });
+  });
+</script>
+  
+{% endblock %}
+
+

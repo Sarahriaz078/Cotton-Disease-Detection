@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-5 " style=" margin-top: 10rem !important" >
+    <h2>Welcome, {{ user.username }} 👋</h2>
+
+    <div class="card mt-4 "  >
+        <div class="card-body">
+            <p><strong>Subscription Plan:</strong> {{ plan }}</p>
+            <p><strong>Upload Limit:</strong> {{ 'Unlimited' if user.is_admin else user.upload_limit }}</p>
+            <p><strong>Remaining Uploads:</strong> {{ 'Unlimited' if user.is_admin else remaining }}</p>
+            <p><strong>Subscription Date:</strong>
+                {% if user.subscription_date %}
+                    {{ user.subscription_date.strftime('%Y-%m-%d %H:%M:%S') }}
+                {% else %}
+                    Not Subscribed
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

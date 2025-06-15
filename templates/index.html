@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+    <title>home page</title>
+    <meta content="" name="description" />
+    <meta content="" name="keywords" />
+
+    <!-- Favicons -->
+    <link rel="icon" href="{{ url_for('static', filename='assets/img/favicon.png') }}"/>
+    <link href="{{ url_for('static', filename='assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon" />
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+      rel="stylesheet"
+    />
+
+    <!-- Vendor CSS Files -->
+    <link
+      href="static/assets/vendor/bootstrap/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="static/assets/vendor/icofont/icofont.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="static/assets/vendor/boxicons/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="static/assets/vendor/remixicon/remixicon.css"
+      rel="stylesheet"
+    />
+    <link href="static/assets/vendor/venobox/venobox.css" rel="stylesheet" />
+    <link
+      href="static/assets/vendor/owl.carousel/assets/owl.carousel.min.css"
+      rel="stylesheet"
+    />
+    <link href="static/assets/vendor/aos/aos.css" rel="stylesheet" />
+
+    <!--  <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">-->
+    <!-- Template Main CSS File -->
+    <link href="static/assets/css/style.css" rel="stylesheet" />
+    <link href="static/assets/css/main.css" rel="stylesheet" />
+    <link
+      href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <!-- =======================================================
+  * Template Name: Arsha - v2.3.1
+  * Template URL: https://bootstrapmade.com/arsha-free-bootstrap-html-template-corporate/
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+  </head>
+  <body>
+    <!-- ======= Header ======= -->
+    <header id="header" class="fixed-top"     style="    padding-top: 15px;
+    padding-bottom: 15px;" >
+      <div class="container d-flex align-items-center">
+        <h1 class="logo mr-auto">
+           <!-- Uncomment below if you prefer to use an image logo -->
+        <a href="{{ url_for('home') }}" class="logo mr-auto"><img src="static\assets\img\logo.png" alt="" class="img-fluid"></a>
+          <a href="{{ url_for('home') }}" class="title" >Cotton Disease Detection</a>
+        </h1>
+       
+        <nav class="nav-menu d-none d-lg-block">
+  <ul>
+    <li class="active"><a href="{{ url_for('home') }}" target="_self">Home</a></li>
+    <!-- <li><a href="{{ url_for('try_page') }}" target="_blank">Run Application</a></li> -->
+    <li class="drop-down"><a href="{{ url_for('diseases_info') }}">Diseases Info</a> 
+      <ul>
+        <li><a href="{{ url_for('aphids') }}">Aphids</a></li>
+        <li><a href="{{ url_for('army_worm') }}">Army Worm</a></li>
+        <li><a href="{{ url_for('bacterial_blight') }}">Bacterial Blight</a></li>
+        <li><a href="{{ url_for('powdery_mildew') }}">Powdery Mildew</a></li>
+        <li><a href="{{ url_for('target_spot') }}">Target Spot</a></li> 
+      </ul>
+    </li>
+    
+    {% if not current_user.is_admin %}
+      <li><a href="{{ url_for('subscription') }}">Pricing</a></li>
+    {% endif %}
+    
+     {% if current_user.is_authenticated %}
+      <li><a href="{{ url_for('my_reports') }}" target="_blank">Reports</a></li>
+    {% endif %}
+
+
+    {% if current_user.is_authenticated and current_user.is_admin %}
+      <li><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+      <li><a href="{{ url_for('logout') }}">Logout</a></li>  <!-- Add logout for admin here -->
+
+    {% endif %}
+    
+  
+    {% if current_user.is_authenticated and not current_user.is_admin %}
+      <li class="drop-down">
+        <a href="{{ url_for('profile') }}">Profile</a>
+        <ul>
+          <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+      </li>
+    {% elif not current_user.is_authenticated %}
+      <li class="drop-down">
+        <a href="#">Login</a>
+        <ul>
+          <li><a href="{{ url_for('login') }}">Signin</a></li>
+          <li><a href="{{ url_for('register') }}">Signup</a></li>
+        </ul>
+      </li>
+    {% endif %}
+  </ul>
+</nav>
+
+        <!-- .nav-menu -->
+
+        <a href="{{ url_for('try_page') }}" target="_blank" class="get-started-btn scrollto"
+          >Get Started</a
+        >
+      </div>
+    </header>
+    <!-- End Header -->
+     
+    <!-- ======= Hero Section ======= -->
+    <section id="hero" class="d-flex align-items-center">
+      <div class="container">
+        <div class="row">
+          <div
+            class="col-lg-6 d-flex flex-column justify-content-center pt-4 pt-lg-0 order-2 order-lg-1"
+            data-aos="fade-up"
+            data-aos-delay="200"
+          >
+            <h1>AI Sees What You Can’t</h1>
+            <h2>Detect cotton leaf diseases early & accurately—just upload and get results.</h2>
+            <!--          <div class="d-lg-flex">-->
+            <!--            <a href="#about" class="btn-get-started scrollto">Get Started</a>-->
+            <!--            <a href="https://www.youtube.com/watch?v=jDDaplaOz7Q" class="venobox btn-watch-video" data-vbtype="video" data-autoplay="true"> Watch Video <i class="icofont-play-alt-2"></i></a>-->
+            <!--          </div>-->
+          </div>
+          <div
+            class="col-lg-6 order-1 order-lg-2 hero-img"
+            data-aos="zoom-in"
+            data-aos-delay="200"
+          >
+            <img
+              src="static\assets\img\home_page.jpg"
+              class="img-fluid animated"
+              alt=""
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- End Hero -->
+    <main id="main">
+     
+
+      <!-- ======= About Us Section ======= -->
+      <section id="about" class="about" style="padding-top: 70px" >
+        <div class="container" data-aos="fade-up">
+          <div class="section-title">
+            <h2>About Cotton Plant Disease</h2>
+          </div>
+
+          <div class="row content">
+            <div class="col-lg-6">
+              <p>
+                The major use of cotton today is in the textile industry, the
+                fibers or 'lints' of the cotton plant are harvested and woven
+                into fabric for the production of clothing, towels, bed sheets
+                and many other textiles.
+              </p>
+              <p>
+                Cotton fiber may also be used in the production of yarn and
+                twine. The cotton seeds can be used to extract oil for use in
+                the production of shortening or cooking oil and the manufacture
+                of soaps and lubricants.
+              </p>
+              <p>
+                <a
+                  class="cta-btn align-middle"
+                  href="https://plantvillage.psu.edu/topics/cotton/infos/diseases_and_pests_description_uses_propagation"
+                  target="_blank"
+                  >Source</a
+                >
+              </p>
+            </div>
+            <div class="col-lg-6 pt-4 pt-lg-0">
+              <p>
+                <strong>Symptoms:</strong>
+                Small, circular brown lesions on cotyledons and seedling leaves
+                which expand and develop a concentric pattern; necrotic areas
+                coalesce and often have a purple margin.
+              </p>
+              <p><strong>Cause:</strong> Fungus</p>
+              <p>
+                <strong>Comments:</strong>
+                Plants stressed by drought, nutrient deficiency and other pests
+                are more susceptible to the disease; fungus spreads rapidly in
+                dense canopies, especially during periods of warm, wet weather.
+              </p>
+
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- End About Us Section -->
+
+    <!-- ======= Why Us Section ======= -->
+<!-- ======= Why Us Section ======= -->
+
+  <head>
+    <meta charset="UTF-8" />
+    <title>Cotton Disease Detection Summary</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Remix Icon -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet" />
+    <style>
+      body {
+        background: #d0d2d7;
+        font-family: 'Segoe UI', sans-serif;
+      }
+
+      .card {
+        border: none;
+        margin-bottom: 30px;
+        transition: all 0.3s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-title {
+        font-weight: 600;
+        color: #444;
+      }
+
+      ul li {
+        padding: 6px 0;
+      }
+
+      ul li i {
+        color: #2a9d8f;
+        margin-right: 5px;
+      }
+
+      a {
+        text-decoration: none;
+        color: #007bff;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .animated-image {
+        border-radius: 10px;
+        width: 300%;
+        height:fit-content;
+        min-height: 50px;
+      }
+
+      .fade-in {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 1s ease forwards;
+      }
+
+      @keyframes fadeInUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 767px) {
+        .col-md-6 {
+          margin-bottom: 1rem;
+        }
+
+        .right-image {
+          margin-top: 2rem;
+        }
+      }
+      @media (max-width: 991.98px) {
+  /* Fix image overflow behind cards */
+  .animated-image {
+    width: 100% !important;
+    margin-bottom: 20px !important;
+    min-height: 220px !important;
+    max-height: 300px;
+    border-radius: 12px;
+  }
+
+  /* Stack image and cards vertically */
+  .row.align-items-center .col-md-4 {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  /* Center the fifth card properly */
+  .row.justify-content-center .col-md-6 {
+    width: 90%;
+    margin: auto;
+  }
+
+  /* Optional: center-align headings and paragraphs for smaller screens */
+  .card-body h4,
+  .card-body p {
+    text-align: center !important;
+  }
+}
+
+    </style>
+  </head>
+  <body>
+    <section id="why-us" class="why-us section-bg">
+
+  <div class="content">
+    <h3 style="text-align: center; margin-top: -79px;">
+      About <strong>Cotton Disease Prediction</strong> Application
+    </h3>
+
+    <div class="container my-5">
+      <h3 style="margin-bottom: 15px; margin-top: 50px;  margin-left: 0px; text-align: center;">
+        How to use this <strong>Application</strong>?
+      </h3>
+
+      <!-- Zigzag Grid Layout -->
+      <div class="row align-items-center mb-4">
+        <div class="col-md-4 fade-in">
+          <div class="card shadow rounded-4">
+            <div class="card-body">
+              <h4 class="card-title"><i class="ri-door-open-line"></i> Step 1: Get Started</h4>
+              <p>Click on the <strong>“Get Started”</strong> button from the homepage or navbar to begin using the application.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 d-flex justify-content-center fade-in">
+          <div class="img animated-image"
+            style="background-image: url(static/assets/img/skills.png);
+    background-size: cover;
+    background-position: center;
+    min-height: 334px;
+    width: 180%;
+    border-radius: 8px;
+    margin-bottom: -215px;">
+          </div>
+        </div>
+
+        <div class="col-md-4 fade-in">
+          <div class="card shadow rounded-4">
+            <div class="card-body">
+              <h4 class="card-title"><i class="ri-search-eye-line"></i> Step 3: Predict</h4>
+              <p>After uploading, click on the <strong>“Predict”</strong> button. The AI model will analyze the image.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row align-items-center mb-4">
+        <div class="col-md-4 fade-in">
+          <div class="card shadow rounded-4">
+            <div class="card-body">
+              <h4 class="card-title"><i class="ri-image-add-line"></i> Step 2: Choose Image</h4>
+              <p>Upload a clear image of a cotton plant or leaf by clicking the <strong>“Choose Image”</strong> button.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 d-none d-md-block"></div>
+
+        <div class="col-md-4 fade-in">
+          <div class="card shadow rounded-4">
+            <div class="card-body">
+              <h4 class="card-title"><i class="ri-bar-chart-line"></i> Step 4: View Result</h4>
+              <p>The app will display the <strong>disease prediction</strong> and health status of the cotton plant.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Centered Step 5 -->
+      <div class="row justify-content-center mt-4">
+        <div class="col-md-6 fade-in">
+          <div class="card shadow rounded-4 text-center">
+            <div class="card-body">
+              <h4 class="card-title"><i class="ri-download-cloud-line"></i> Step 5: Download Report</h4>
+              <p style="text-align: center; padding-left: 20px;margin-bottom: 0px; margin-right: 15px; margin-top: 6px;">You can <strong>download a detailed PDF report</strong> of the prediction for your records.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Animation Delay Script -->
+    <script>
+      window.addEventListener('load', () => {
+        const cards = document.querySelectorAll('.fade-in');
+        cards.forEach((card, index) => {
+          card.style.animationDelay = `${index * 0.2}s`;
+        });
+      });
+    </script>
+
+</section>
+
+  
+    </main>
+    <!-- End #main -->
+    <footer id="footer">
+      <div class="footer-top">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-3 col-md-6 footer-contact">
+              <h4>Cotton Plant Disease Detection</h4>
+              <p style = "margin-top: -15px; ">ID: BSE-2132</p>
+             <h4 style = "margin-top: 11px; margin-bottom: -10px;" >Project Team</h4>
+              <p style="margin-top: 2px;" >
+               Jannat Yousaf<br />
+               Sarah Riaz<br />
+               Usama Dar<br />
+               </p>
+
+                <strong>Phone:</strong> +92-8123920743<br />
+                <strong>Email:</strong> finitelyi8@gmail.com<br />
+              
+            </div>
+
+            <div class="col-lg-3 col-md-6 footer-links">
+  <h4>Technologies Used</h4>
+  <ul>
+    <p>Python (Flask)</p>
+    <p>TensorFlow / Keras</p>
+    <p>SQLite</p>
+    <p>Bootstrap 5</p>
+  </ul>
+</div>
+
+            <div class="col-lg-3 col-md-6 footer-links">
+              <h4>Social Networks</h4>
+                         <p>Also join us on</p>
+              <div class="social-links mt-3">
+                             <!-- <a href="#" class="twitter"><i class="bx bxl-twitter"></i></a> -->
+                             <a href="https://www.facebook.com/" class="facebook"><i class="bx bxl-facebook"></i></a>
+                             <a href="https://www.instagram.com/" class="instagram"><i class="bx bxl-instagram"></i></a>
+                             <!-- <a href="#" class="google-plus"><i class="bx bxl-skype"></i></a> -->
+                <a href="https://www.linkedin.com/" target="_blank" class="linkedin"><i class="bx bxl-linkedin"></i></a>
+                <a href="https://github.com/" target="_blank" class="github"><i class="bx bxl-github"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container footer-bottom clearfix">
+        <div class="copyright">
+          &copy; Copyright <strong><span>BSE-2132</span></strong
+          >. All Rights Reserved
+        </div>
+        <div class="credits">
+          Designed by
+          Project Team – BSE-2132
+        </div>
+      </div>
+    </footer>
+    <!-- End Footer -->
+
+    <a href="#" class="back-to-top"><i class="ri-arrow-up-line"></i></a>
+    <div id="preloader"></div>
+
+    <script src="static/assets/vendor/jquery/jquery.min.js"></script>
+    <script src="static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="static/assets/vendor/jquery.easing/jquery.easing.min.js"></script>
+    <script src="static/assets/vendor/php-email-form/validate.js"></script>
+    <script src="static/assets/vendor/waypoints/jquery.waypoints.min.js"></script>
+    <script src="static/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="static/assets/vendor/venobox/venobox.min.js"></script>
+    <script src="static/assets/vendor/owl.carousel/owl.carousel.min.js"></script>
+    <script src="static/assets/vendor/aos/aos.js"></script>
+    <script src="static/assets/js/main.js"></script>
+    <script src="static/assets/js/main2.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Toast container -->
+<div aria-live="polite" aria-atomic="true" 
+     style="position: fixed; top: 1rem; right: 1rem; z-index: 1050;">
+  <div id="toast-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="toast align-items-center text-bg-{{ category }} border-0 mb-2" 
+             role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="20000">
+          <div class="d-flex">
+            <div class="toast-body">
+              {{ message }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" 
+                    data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        </div>
+      {% endfor %}
+    {% endwith %}
+  </div>
+</div>
+
+<!-- Bootstrap toast script -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const toastElList = [].slice.call(document.querySelectorAll('.toast'));
+    toastElList.forEach(function (toastEl) {
+      const toast = new bootstrap.Toast(toastEl);
+      toast.show();
+    });
+  });
+</script>
+
+
+  </body>
+</html>

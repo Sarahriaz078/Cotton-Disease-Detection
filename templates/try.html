@@ -1,0 +1,228 @@
+<!-- Optional: Custom styling for alerts -->
+<style>
+  .alert {
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin: 10px 0;
+    font-size: 0.95rem;
+  }
+  .alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+  .alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+  }
+  
+</style>
+{% extends "base.html" %} {% block content %}
+<section id="portfolio" class="portfolio">
+  <div class="container" data-aos="fade-up">
+    <div class="section-title">
+      <h2>Run Cotton Disease Prediction</h2>
+      <p>Choose image | Wait a few seconds | Click on predict</p>
+    </div>
+
+    <form id="upload-file" method="post" enctype="multipart/form-data">
+      <label for="imageUpload" class="upload-label"> Choose Image </label>
+      <input
+        type="file" 
+        name="file"
+        id="imageUpload"
+        accept=".png, .jpg, .jpeg"
+      />
+    </form>
+
+   <div class="image-section" style="display: none">
+  <div class="img-preview">
+    <div id="imagePreview"></div>
+  </div>
+
+  <div class="mt-3">
+          <div class="loader" style="display: none; margin: 20px 0;"></div>
+<div id="result"  class="mt-3 fw-bolder fs-3 text-dark" style="margin: 5px 0; font-weight: 900; font-size: 1.5rem;"></div>    
+<button type="button" class="btn btn-primary btn-lg" id="btn-predict">
+      Predict
+    </button>
+ <!-- Hidden download button -->
+  <a href="#" id="download-link" class="btn btn-success btn-lg ml-2" style="display: none;">
+  <i class="fa fa-download"></i> Download Report
+</a>
+
+  </div>
+</div>
+
+
+    
+    <!-- Disclaimers, Warnings, and Guidance -->
+    <div class="note mt-4">
+      <div class="alert alert-warning">
+        <strong>Note:</strong> Some plant diseases may have <em>similar visual symptoms</em>, which might lead to prediction mismatches.
+      </div>
+      <div class="alert alert-info">
+        This is an <strong>AI-powered tool</strong>. For accurate diagnosis and treatment, please consult a qualified agricultural expert.
+      </div>
+      <ul class="text-muted" style="font-size: 0.95rem;">
+        <li>🟡 Ensure the image shows a clear view of a single cotton leaf.</li>
+        <li>🔴 Avoid uploading images of non-plant objects or blurry photos.</li>
+        <li>⚠️ If confidence is low, the system may fail to return accurate results.</li>
+        <li>📝 Supported diseases: Aphids, Army Worm, Bacterial Blight, Powdery Mildew, Target Spot.</li>
+      </ul>
+     </div>
+
+   
+  </div>
+
+</section>
+
+<!-- Toast container -->
+<div aria-live="polite" aria-atomic="true" 
+     style="position: fixed; top: 1rem; right: 1rem; z-index: 1050;">
+  <div id="toast-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="toast align-items-center text-bg-{{ category }} border-0 mb-2" 
+             role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="50000">
+          <div class="d-flex">
+            <div class="toast-body">
+              {{ message }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" 
+                    data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        </div>
+      {% endfor %}
+    {% endwith %}
+  </div>
+</div>
+
+<!-- Bootstrap toast script -->
+<script>
+
+function showToast(type, message) {
+    const toastHTML = `
+    <div class="toast align-items-center text-bg-${type} border-0 mb-2" 
+         role="alert" aria-live="assertive" aria-atomic="true" 
+         data-bs-delay="50000" data-bs-autohide="true">
+      <div class="d-flex">
+        <div class="toast-body">${message}</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" 
+                data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>`;
+
+    const container = document.getElementById('toast-container');
+    container.insertAdjacentHTML('beforeend', toastHTML);
+    const newToast = container.lastElementChild;
+
+    // ✅ Show with Bootstrap's JavaScript
+    const toastInstance = new bootstrap.Toast(newToast, {
+        autohide: true,  // Set to false if you want manual close
+        delay: 50000     // 10 seconds
+    });
+
+    toastInstance.show();
+}
+
+document.getElementById('result').textContent = '';
+const container = document.getElementById('toast-container');
+container.innerHTML = '';  // Remove previous toasts to avoid clutter
+
+
+  
+
+  document.getElementById('imageUpload').addEventListener('change', (event) => {
+    document.querySelector('.image-section').style.display = 'block';
+
+    const preview = document.getElementById('imagePreview');
+    preview.innerHTML = ''; // clear previous
+
+    const file = event.target.files[0];
+    if (file) {
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        img.style.maxWidth = '250px';
+        img.style.maxHeight = '250px';
+        img.onload = () => URL.revokeObjectURL(img.src);  // free memory
+        preview.appendChild(img);
+    }
+});
+
+  
+document.getElementById('btn-predict').addEventListener('click', async () => {
+  const formData = new FormData(document.getElementById('upload-file'));
+  const loader = document.querySelector('.loader');
+  const resultElement = document.getElementById('result');
+  const downloadLink = document.getElementById('download-link');
+  
+  // Reset UI state
+  loader.style.display = 'block';
+  resultElement.style.display = 'none';
+  downloadLink.style.display = 'none';
+
+  try {
+    const response = await fetch('/predict', {
+      method: 'POST',
+      body: formData
+    });
+
+    const contentType = response.headers.get('content-type');
+    loader.style.display = 'none';
+
+    // Handle error responses
+    if (response.status === 403 || response.status === 401) {
+      let message = "Access denied.";
+      let redirectURL = '/';
+
+      if (contentType?.includes('application/json')) {
+        const data = await response.json();
+        message = data.message || message;
+        redirectURL = data.redirect || redirectURL;
+      }
+
+      showToast('warning', message);
+      setTimeout(() => window.location.href = redirectURL, 2500);
+      return;
+    }
+
+    // Handle successful prediction
+    if (response.ok) {
+      if (contentType?.includes('application/json')) {
+        const data = await response.json();
+        
+        // Display prediction result
+        if (data.confidence) {
+          resultElement.textContent = `${data.prediction} (Confidence: ${data.confidence}%)`;
+        } else {
+          resultElement.textContent = data.prediction;
+        }
+        resultElement.style.display = 'block';
+        
+        // Show download link if report exists
+        if (data.report_id) {
+          downloadLink.href = `/download_report/${data.report_id}`;
+          downloadLink.style.display = 'inline-block';
+        }
+      } else {
+        // Fallback for non-JSON responses (legacy support)
+        const result = await response.text();
+        resultElement.textContent = result;
+        resultElement.style.display = 'block';
+      }
+    } else {
+      // Handle other error cases
+      const error = await response.json().catch(() => ({ message: "Unknown error" }));
+      showToast('danger', error.message || "Prediction failed");
+    }
+  } catch (error) {
+    loader.style.display = 'none';
+    console.error('Unexpected error:', error);
+    showToast('danger', 'Network error occurred. Please try again.');
+  }
+});
+
+
+</script>
+
+{% endblock %}

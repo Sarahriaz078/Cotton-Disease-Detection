@@ -1,0 +1,252 @@
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+{% extends "base.html" %}
+{% block title %}Subscription Plans{% endblock %}
+
+{% block content %}
+<style>
+  .subscription-container {
+    padding: 60px 20px;
+    background: linear-gradient(to right, #f9fafb, #eef2f7);
+    min-height: 100vh;
+  }
+
+  .subscription-title {
+    text-align: center;
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #1e3a8a;
+    margin-bottom: 50px;
+  }
+
+  .pricing-card {
+    border: none;
+    border-radius: 18px;
+    overflow: hidden;
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.07);
+    position: relative;
+    background-color: #ffffff;
+  }
+
+  .pricing-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.15);
+  }
+
+  .pricing-header {
+    padding: 21px;
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    color: #ffffff;
+  }
+
+  .free-header {
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+  }
+
+  .premium-header {
+    background: linear-gradient(135deg, #065f46, #10b981);
+  }
+
+  .diamond-header {
+    background: linear-gradient(135deg, #92400e, #f59e0b);
+  }
+
+ .most-popular-badge {
+  position: absolute;
+  top: -3px;
+  right: -4px;
+  background: #ef4444;
+  padding: 3px 10px 0px 4px;
+  font-size: 7px;
+  color: white;
+  font-weight: 600;
+  border-radius: 0 0 0 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+
+  .pricing-card .card-body {
+    padding: 35px 25px;
+    text-align: center;
+  }
+
+  .pricing-card h5 {
+    font-size: 26px;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 10px;
+  }
+
+  .price-tag {
+    font-size: 20px;
+    font-weight: bold;
+    color: #1e293b;
+    margin-bottom: 15px;
+    margin-top: 35px;
+  }
+
+  .card-text {
+    font-size: 1rem;
+    color: #475569;
+    margin-bottom: 25px;
+  }
+
+  .btn-plan {
+    padding: 10px 25px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: 0.3s ease-in-out;
+    display: inline-block;
+    margin-top: 20px;
+  }
+
+  .btn-free {
+    color: #1e3a8a;
+    border: 2px solid #1e3a8a;
+    background-color: transparent;
+  }
+
+  .btn-free:hover {
+    background-color: #1e3a8a;
+    color: white;
+  }
+
+  .btn-premium {
+    background-color: #10b981;
+    color: white;
+    border: none;
+  }
+
+  .btn-premium:hover {
+    background-color: #059669;
+  }
+
+  .btn-diamond {
+    background-color: #f59e0b;
+    color: white;
+    border: none;
+  }
+
+  .btn-diamond:hover {
+    background-color: #d97706;
+  }
+.plan-details {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 15px;
+}
+
+.plan-details li {
+  font-size: 0.95rem;
+  color: #334155;
+  margin-bottom: 6px;
+  padding-left: 2rem;
+  position: relative;
+}
+
+.plan-details li::before {
+  content: "✔";
+  position: absolute;
+  left: 0;
+  color: green;
+  font-weight: bold;
+}
+
+  
+</style>
+
+<div class="subscription-container">
+  <h2 class="subscription-title">Choose Your Subscription Plan</h2>
+  <div class="row justify-content-center">
+
+    <!-- Free Plan -->
+    <div class="col-md-4 mb-5">
+      <div class="pricing-card">
+        <div class="pricing-header free-header">
+          <i class="fas fa-leaf me-2"></i> Free
+        </div>
+        <div class="card-body">
+          <h5>3 Image Uploads</h5>
+          <div class="price-tag">Free</div>
+       <p class="card-text">
+  A risk-free way to explore the cotton plant disease detection system. Ideal for first-time users.
+</p>
+<ul class="plan-details text-start">
+  <li> Upload up to 3 cotton leaf images</li>
+  <li> AI-powered disease diagnosis</li>
+  <li> PDF report generation included</li>
+  <li> No payment or signup fee required</li>
+</ul>
+
+
+          <a href="{{ url_for('try_page') }}" class="btn btn-plan btn-free">
+            Get Started
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Premium Plan -->
+    <div class="col-md-4 mb-5">
+      <div class="pricing-card">
+        <div class="most-popular-badge">Most Popular</div>
+        <div class="pricing-header premium-header">
+          <i class="fas fa-star me-2"></i> Premium
+        </div>
+        <div class="card-body">
+          <h5>20 Image Uploads</h5>
+          <div class="price-tag">$9.99</div>
+        <p class="card-text">
+  Best suited for regular users who frequently inspect and monitor their cotton fields.
+</p>
+<ul class="plan-details text-start">
+  <li> Upload up to 20 leaf images per month</li>
+  <li> Fast and accurate ResNet50-based diagnosis</li>
+  <li> Downloadable detailed PDF reports</li>
+  <li> Priority access to future feature updates</li>
+</ul>
+
+
+          <a href="{{ url_for('buy_subscription', plan='premium') }}" class="btn btn-plan btn-premium">
+            Upgrade to Premium
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Diamond Plan -->
+    <div class="col-md-4 mb-5">
+      <div class="pricing-card">
+        <div class="pricing-header diamond-header">
+          <i class="fas fa-gem me-2"></i> Diamond
+        </div>
+        <div class="card-body">
+          <h5>100 Image Uploads</h5>
+          <div class="price-tag">$24.99</div>
+        <p class="card-text">
+  Designed for agri-businesses, researchers, and professionals handling large-scale crop monitoring.
+</p>
+<ul class="plan-details text-start">
+  <li> Upload up to 100 images monthly</li>
+  <li> Advanced AI diagnosis using ResNet50</li>
+  <li> Unlimited PDF reports for record-keeping</li>
+  <li> Admin dashboard access for data review</li>
+  
+</ul>
+
+
+          <a href="{{ url_for('buy_subscription', plan='diamond') }}" class="btn btn-plan btn-diamond">
+            Upgrade to Diamond
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
