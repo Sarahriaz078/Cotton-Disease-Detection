@@ -113,7 +113,7 @@ The Cotton Disease Detection System is an AI-powered web application that helps 
 
 ### Prerequisites
 
-- Python 3.8 or higher
+- Python 3.12.5
 - pip (Python package manager)
 - Git
 - Git LFS (for model files)
