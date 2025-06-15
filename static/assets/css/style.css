@@ -222,13 +222,13 @@ font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .nav-menu a:hover {
-  color: #332564;
+  color: #47b2e4;
 }
 .nav-menu .active > a {
   color: #ffffff;
 }
 .nav-menu li:hover > a {
-  color: #2a0d91;
+  color: #47b2e4;
 }
 .nav-menu .drop-down ul {
   border-radius: 8px;
