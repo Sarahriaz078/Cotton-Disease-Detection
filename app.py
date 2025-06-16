@@ -1,4 +1,4 @@
-import os,csv
+import os,csv,requests, base64,json
 import io
 import stripe
 from dotenv import load_dotenv
@@ -24,7 +24,6 @@ from werkzeug.utils import secure_filename
 from tensorflow.keras.models import load_model
 # from tensorflow.keras.applications.resnet50 import preprocess_input
 from tensorflow.keras.preprocessing import image
-from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2, preprocess_input, decode_predictions
 import numpy as np
 from flask_wtf.csrf import CSRFProtect
 from sqlalchemy.orm import joinedload
@@ -47,6 +46,8 @@ PRICE_IDS = {
     'premium': os.getenv('STRIPE_PREMIUM_PRICE_ID'),
     'diamond': os.getenv('STRIPE_DIAMOND_PRICE_ID')
 }
+GEMINI_API_KEY = "AIzaSyDGVycske4xQ0LlsGD1Q01oZUSe9QpL_-o"
+GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
 # In app.py or settings
 app.config['WTF_CSRF_HEADERS'] = ['X-CSRFToken']
 csrf = CSRFProtect(app)
@@ -63,20 +64,88 @@ filter_model = MobileNetV2(weights='imagenet')
 
 # load trained model
 model = load_model(MODEL_PATH)
-def is_plant_image(img_path,confidence_threshold=0.60):
-    img = image.load_img(img_path, target_size=(224, 224))
-    img_array = image.img_to_array(img)
-    img_array = preprocess_input(np.expand_dims(img_array, axis=0))
+def is_plant_image(img_path):
+# Read and encode the image
+    with open(img_path, "rb") as img_file:
+        img_bytes = img_file.read()
+    img_b64 = base64.b64encode(img_bytes).decode("utf-8")
 
-    preds = filter_model.predict(img_array)
-    decoded = decode_predictions(preds, top=10)[0] # Get top 5 predictions
-    leaf_keywords = ['leaf', 'plant', 'tree', 'flower', 'vegetable', 'fruit', 'foliage', 'cabbage', 'lettuce', 'corn', 'pineapple', 'banana']
+    # Determine mime_type based on file extension (add this for robustness)
+    mime_type = "image/jpeg"
+    if img_path.lower().endswith(".png"):
+        mime_type = "image/png"
+    elif img_path.lower().endswith(".jpg") or img_path.lower().endswith(".jpeg"):
+        mime_type = "image/jpeg"
+    else:
+        print(f"Warning: Unknown image file type for {img_path}. Defaulting to image/jpeg.")
+        # You might want to raise an error or handle other mime types here
+        # For now, we'll proceed with a default, but this could be a source of error.
 
-    # Check if any predicted label is plant-related
-    for _, label, prob in decoded:
-        if any(keyword in label.lower() for keyword in leaf_keywords)and prob > confidence_threshold:
-            return True
-    return False
+    headers = {"Content-Type": "application/json"}
+    # Ensure GEMINI_URL is correctly defined and accessible here
+    # Assuming GEMINI_URL includes your API key if required in the URL,
+    # or that an Authorization header is managed elsewhere if the API requires it.
+    # For example: GEMINI_URL = f"YOUR_GEMINI_API_ENDPOINT?key={YOUR_API_KEY}"
+    # Or: headers["Authorization"] = f"Bearer {YOUR_API_KEY}"
+
+    payload = {
+        "contents": [
+            {
+                "parts": [
+                    {
+                        "inline_data": {
+                            "mime_type": mime_type,
+                            "data": img_b64
+                        }
+                    },
+                    {
+                       "text": "Analyze the following image. Determine if it is a plant, a leaf, or a diseased plant image. Respond with 'yes' if it belongs to any of these categories, and 'no' otherwise."
+                    }
+                ]
+            }
+        ]
+    }
+
+    try:
+        print(f"Sending request to Gemini API for image: {img_path}")
+        response = requests.post(GEMINI_URL, headers=headers, json=payload)
+
+        # Print the HTTP status code
+        print("Gemini API HTTP Status Code:", response.status_code)
+
+        # Print the raw JSON response, even if it's an error
+        result = response.json()
+        print("Gemini API Raw Response JSON:")
+        print(json.dumps(result, indent=2)) # Pretty print the JSON
+
+        # Check for error in the response structure (common for API errors)
+        if response.status_code != 200:
+            print(f"Gemini API returned an error status code: {response.status_code}")
+            if 'error' in result:
+                print("Gemini API Error Message:", result['error'].get('message', 'No specific error message.'))
+            return False # Treat non-200 responses as invalid
+
+        # Now, try to extract the text as before
+        reply = result['candidates'][0]['content']['parts'][0]['text'].strip().lower()
+        print("Gemini extracted response text:", reply)
+
+        # Updated parsing logic for robustness
+        return reply == 'yes' # Expecting exact 'yes' or 'no'
+
+    except requests.exceptions.RequestException as req_e:
+        print(f"Network or request error during Gemini API call: {req_e}")
+        return False
+    except KeyError as key_e:
+        print(f"KeyError: Missing expected key in Gemini API response: {key_e}")
+        print("This often means the JSON structure was unexpected. See 'Gemini API Raw Response JSON' above.")
+        return False
+    except json.JSONDecodeError as json_e:
+        print(f"JSONDecodeError: Could not decode JSON from Gemini API response: {json_e}")
+        print("Raw response content:", response.text)
+        return False
+    except Exception as e:
+        print("An unexpected error occurred during Gemini validation:", e)
+        return False
 
 def model_predict(img_path, model,confidence_threshold=0.55):
     print('Uploaded image path: ',img_path)
@@ -108,11 +177,6 @@ def model_predict(img_path, model,confidence_threshold=0.55):
         5: "The leaf shows signs of Target Spot"
     }
 
-    # if confidence < confidence_threshold or not is_plant_image(img_path):
-    #     return "Prediction confidence is low. Please upload a clearer or relevant image or The uploaded image does not seem to be a valid plant leaf. Please upload a leaf image."
-    # if not is_plant_image(img_path):
-    #   return "Prediction confidence is low. Please upload a clearer or relevant image or The uploaded image does not seem to be a valid plant leaf. Please upload a leaf image."
-    # Return prediction with confidence percentage
     return f"{disease_labels.get(results_index, 'Unknown disease')} (Confidence: {confidence*100:.2f}%)"
 
 # ------------------- Models -------------------
@@ -188,6 +252,8 @@ def download_report(report_id):
         flash("Report not found or unauthorized access.", "danger")
         return redirect(url_for('home'))
 
+    user = User.query.filter_by(id=report.user_id).first()
+    username = user.username if user else "N/A"
     image_path = image_path = os.path.join("uploads", report.filename)
     # Format confidence safely
     try:
@@ -262,24 +328,30 @@ def download_report(report_id):
     line_height = 30
     start_y = y + box_height - 40
 
-    # Filename
-    p.drawString(label_x, start_y, "Filename:")
+   # Username
+    p.drawString(label_x, start_y, "Username:")
     p.setFont("Helvetica", 12)
-    p.drawString(value_x, start_y, report.filename)
+    p.drawString(value_x, start_y, username)
 
-    # Prediction (multi-line)
+    # Filename (shifted downward)
     p.setFont("Helvetica-Bold", 12)
-    p.drawString(label_x, start_y - line_height, "Prediction:")
+    p.drawString(label_x, start_y - line_height, "Filename:")
+    p.setFont("Helvetica", 12)
+    p.drawString(value_x, start_y - line_height, report.filename)
+
+     # Prediction (multi-line)
+    p.setFont("Helvetica-Bold", 12)
+    p.drawString(label_x, start_y - line_height*2, "Prediction:")
     prediction_text = report.prediction
     max_text_width = box_width - (2 * padding + 110)
     prediction_lines = simpleSplit(prediction_text, "Helvetica", 12, max_text_width)
 
     p.setFont("Helvetica", 12)
     for i, line in enumerate(prediction_lines):
-        p.drawString(value_x, start_y - line_height - (i * 15), line)
+        p.drawString(value_x, start_y - line_height*2 - (i * 15), line)
 
     # Adjust position for next items
-    extra_offset = line_height + (len(prediction_lines) * 15)
+    extra_offset = line_height*2 + (len(prediction_lines) * 15)
     current_y = start_y - extra_offset
 
     # Confidence
@@ -348,6 +420,12 @@ def upload():
         # Save file and predict
         file_path = os.path.join(os.path.dirname(__file__), 'uploads', f.filename)
         f.save(file_path)
+        # 🧠 GEMINI VALIDATION
+        if not is_plant_image(file_path):
+            return jsonify({
+                'status': 'error',
+                'message': 'Invalid image. Please upload plant leaf image.'
+            }), 400
         preds = model_predict(file_path, model)
 
         # Extract prediction and confidence properly
