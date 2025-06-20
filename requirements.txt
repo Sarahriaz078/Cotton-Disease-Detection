@@ -26,3 +26,4 @@ gunicorn==22.0.0
 reportlab==4.4.1
 stripe==12.2.0
 python-dotenv
+requests
