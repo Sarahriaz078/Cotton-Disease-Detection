@@ -57,6 +57,48 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
+
+import requests
+import tempfile
+from tensorflow.keras.models import load_model
+
+# Google Drive File ID
+FILE_ID = "1kJXOO97Y6EVL0p3kXhsEW1Y695GZqI2P"
+
+# Build download URL with confirm workaround
+def download_file_from_google_drive(file_id):
+    URL = "https://docs.google.com/uc?export=download"
+
+    session = requests.Session()
+    response = session.get(URL, params={"id": file_id}, stream=True)
+
+    def get_confirm_token(response):
+        for key, value in response.cookies.items():
+            if key.startswith("download_warning"):
+                return value
+        return None
+
+    token = get_confirm_token(response)
+
+    if token:
+        params = {"id": file_id, "confirm": token}
+        response = session.get(URL, params=params, stream=True)
+
+    return response
+
+# Download and save to temp file
+print("📥 Downloading model...")
+response = download_file_from_google_drive(FILE_ID)
+
+with tempfile.NamedTemporaryFile(suffix=".h5", delete=False) as tmp_file:
+    tmp_file.write(response.content)
+    tmp_file.flush()
+    model_path = tmp_file.name
+
+# Load model
+model = load_model(model_path)
+print("✅ Model loaded successfully from Google Drive!")
+
 # Load the trained model
 # model name
 MODEL_PATH ='/app/resnet50.h5'
