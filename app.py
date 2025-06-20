@@ -57,12 +57,49 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# Load the trained model
-# model name
-MODEL_PATH ='/app/resnet50.h5'
+import requests
+import tempfile
+from tensorflow.keras.models import load_model
 
-# load trained model
-model = load_model(MODEL_PATH)
+import requests
+import tempfile
+from tensorflow.keras.models import load_model
+
+# 🔁 Google Drive File ID
+FILE_ID = "1kJXOO97Y6EVL0p3kXhsEW1Y695GZqI2P"
+
+# Google Drive direct download URL
+GDRIVE_URL = f"https://drive.google.com/uc?export=download&id={FILE_ID}"
+
+# Download the model from Google Drive
+print("📥 Downloading model from Google Drive...")
+
+try:
+    response = requests.get(GDRIVE_URL)
+    response.raise_for_status()  # raise error if download fails
+
+    # Save to a temporary file
+    with tempfile.NamedTemporaryFile(suffix=".h5", delete=False) as tmp_file:
+        tmp_file.write(response.content)
+        tmp_file.flush()
+        model_path = tmp_file.name
+
+    print("📦 Model saved to:", model_path)
+
+    # Load the model
+    model = load_model(model_path)
+    print("✅ Model loaded successfully!")
+
+except Exception as e:
+    print("❌ Failed to download/load the model:", e)
+
+
+# # Load the trained model
+# # model name
+# MODEL_PATH ='/app/resnet50.h5'
+
+# # load trained model
+# model = load_model(MODEL_PATH)
 def is_plant_image(img_path):
 # Read and encode the image
     with open(img_path, "rb") as img_file:
