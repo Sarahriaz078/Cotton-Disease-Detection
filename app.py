@@ -59,7 +59,7 @@ login_manager.login_view = 'login'
 
 # Load the trained model
 # model name
-MODEL_PATH ='resnet50.h5'
+MODEL_PATH ='/app/resnet50.h5'
 
 # load trained model
 model = load_model(MODEL_PATH)
