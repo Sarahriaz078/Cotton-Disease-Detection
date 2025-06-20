@@ -99,12 +99,7 @@ with tempfile.NamedTemporaryFile(suffix=".h5", delete=False) as tmp_file:
 model = load_model(model_path)
 print("✅ Model loaded successfully from Google Drive!")
 
-# Load the trained model
-# model name
-MODEL_PATH ='/app/resnet50.h5'
 
-# load trained model
-model = load_model(MODEL_PATH)
 def is_plant_image(img_path):
 # Read and encode the image
     with open(img_path, "rb") as img_file:
